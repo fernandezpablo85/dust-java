@@ -7,29 +7,19 @@ import java.io._
 class Dust
 {
   val context = Context.enter
-  def render (template : InputStream, data : InputStream) =
+  val scope = context.initStandardObjects
+  loadDust(scope)
+  
+  def compile (template : InputStream)
   {
     val templateString = getString(template)
+    loadTemplate(templateString)
+  }
+
+  def render (data : InputStream, template : String = "template") = 
+  {
     val dataString = getString(data)
-    val scope = context.initStandardObjects()
-
-    val dust = classOf[Dust].getResourceAsStream("dust.js")
-    context.evaluateString(scope, getString(dust), "<dust-loading>", 1, null)
-    val script = """
-      var compiled = dust.compile("%s", "%s");
-      dust.loadSource(compiled);
-    """.format(templateString, "name")
-    context.evaluateString(scope, script, "<template-loading>", 2, null);
-
-     val script2 = """
-        var result = 'not finished';
-        dust.render("%s", %s, function(err, out) {
-          result = out;
-        });
-        result;
-      """.format("name", dataString)
-      val rendered = context.evaluateString(scope, script2, "<template-rendering>", 2, null)
-      
+    val rendered = renderTemplate(dataString, template)
     rendered.toString
   }
   
@@ -45,22 +35,33 @@ class Dust
 
   private def loadDust (scope : Scriptable) =
   {
-
+    val dust = classOf[Dust].getResourceAsStream("dust.js")
+    context.evaluateString(scope, getString(dust), "<dust-loading>", 1, null)
   }
 
-  private def loadTemplate(scope : Scriptable, template : String, name : String = "template")
+  private def loadTemplate(template : String, name : String = "template")
   {
-
+    val script = """
+      var compiled = dust.compile("%s", "%s");
+      dust.loadSource(compiled);
+    """.format(template, name)
+    context.evaluateString(scope, script, "<template-loading>", 2, null);
   }
 
-  private def renderTemplate(scope : Scriptable, data : String, name : String = "template") = 
+  private def renderTemplate(data : String, name : String) = 
   {
-   
+    val script2 = """
+       var result = 'not finished';
+       dust.render("%s", %s, function(err, out) {
+         result = out;
+       });
+       result;
+     """.format(name, data)
+     context.evaluateString(scope, script2, "<template-rendering>", 2, null)
   }
 }
 
 object Dust
 {
-  def render (template : InputStream, data : InputStream) = new Dust().render(template, data)
-  def example = new Dust().example
+
 }
