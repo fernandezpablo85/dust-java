@@ -20,7 +20,7 @@ class DustSpec extends Spec with ShouldMatchers
 
       val result = Dust.render(template, data)
 
-      result should be ("Hello Mick! You have 30 new messages")
+      result should be ("Hello Mick! You have 30 new messages.")
     }
   }
 }

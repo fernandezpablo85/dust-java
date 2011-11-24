@@ -13,12 +13,10 @@ class Dust
     val dataString = getString(data)
     val scope = context.initStandardObjects()
 
-    context.evaluateString(scope, "var window = {}; window.dust = {};", "<dust-loading-0>", 1, null)
-
     val dust = classOf[Dust].getResourceAsStream("dust.js")
     context.evaluateString(scope, getString(dust), "<dust-loading>", 1, null)
     val script = """
-      var compiled = window.dust.compile("%s", "%s");
+      var compiled = dust.compile("%s", "%s");
       dust.loadSource(compiled);
     """.format(templateString, "name")
     context.evaluateString(scope, script, "<template-loading>", 2, null);

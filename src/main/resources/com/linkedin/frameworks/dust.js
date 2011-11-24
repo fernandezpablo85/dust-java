@@ -6,6 +6,8 @@
  Released under the MIT License.
 */
 
+var dust = {};
+
 (function(dust) {
 
 dust.cache = {};
@@ -836,7 +838,7 @@ var escape = (typeof JSON === "undefined")
   ? function(str) { return "\"" + dust.escapeJs(str) + "\"" }
   : JSON.stringify;
 
-})(typeof exports !== 'undefined' ? exports : window.dust);
+})(dust);
 (function(dust){
 
 var parser = (function(){
@@ -3204,4 +3206,4 @@ var parser = (function(){
 
 dust.parse = parser.parse;
 
-})(window.dust);
+})(dust);
